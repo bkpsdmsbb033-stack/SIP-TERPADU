@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SIP Terpadu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+        <div class="bg-indigo-900 p-8 text-white text-center">
+            <div class="inline-flex bg-white/10 p-3 rounded-xl mb-4">
+                <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">SIP-TERPADU</h1>
+            <p class="text-indigo-200 text-sm mt-1 uppercase tracking-widest font-medium">BAGIAN UMUM, PERENCANAAN DAN KEUANGAN</p>
+        </div>
+
+        <form id="loginForm" class="p-8 space-y-5">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Hak Akses</label>
+                <select id="roleSelect" onchange="toggleFields()" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-slate-50 font-medium">
+                    <option value="ADMINISTRATOR">Administrator</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="USER">User (Tamu/Pegawai)</option>
+                </select>
+            </div>
+
+            <div id="authFields" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">NIP / Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </span>
+                        <input type="text" id="username" placeholder="Masukkan NIP" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Kata Sandi</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i data-lucide="lock" class="w-5 h-5"></i>
+                        </span>
+                        <input type="password" id="password" placeholder="••••••••" class="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition">
+                            <i id="eyeIcon" data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition transform active:scale-[0.98] flex items-center justify-center gap-2">
+                <span>MASUK KE SISTEM</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </form>
+
+        <div class="px-8 pb-8 text-center">
+            <p class="text-xs text-slate-400 font-medium italic">Pastikan Anda menggunakan akun yang telah terverifikasi oleh BKPSDM.</p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // DATA AKUN (Bisa Anda edit di sini)
+        const dataAkun = {
+            ADMIN: [
+                { nip: "199001", pass: "admin1", nama: "Admin Satu" },
+                { nip: "199002", pass: "admin2", nama: "Admin Dua" },
+                { nip: "199003", pass: "admin3", nama: "Admin Tiga" },
+                { nip: "199004", pass: "admin4", nama: "Admin Empat" },
+                { nip: "199005", pass: "admin5", nama: "Admin Lima" },
+                { nip: "199006", pass: "admin6", nama: "Admin Enam" },
+                { nip: "199007", pass: "admin7", nama: "Admin Tujuh" },
+                { nip: "199008", pass: "admin8", nama: "Admin Delapan" },
+                { nip: "199009", pass: "admin9", nama: "Admin Sembilan" },
+                { nip: "199010", pass: "admin10", nama: "Admin Sepuluh" }
+            ],
+            ADMINISTRATOR: [
+                { nip: "198110032006041013", pass: "chresti", nama: "CH.F.TUWANAKOTTA,S.Kom.,M.M" },
+                { nip: "198402112009042005", pass: "fanny", nama: "Fanny Tuapetel, S.Sos" },
+                { nip: "333", pass: "super3", nama: "Super Admin 3" },
+                { nip: "444", pass: "super4", nama: "Super Admin 4" },
+                { nip: "555", pass: "super5", nama: "Super Admin 5" },
+                { nip: "666", pass: "super6", nama: "Super Admin 6" },
+                { nip: "777", pass: "super7", nama: "Super Admin 7" },
+                { nip: "888", pass: "super8", nama: "Super Admin 8" },
+                { nip: "999", pass: "super9", nama: "Super Admin 9" },
+                { nip: "000", pass: "super10", nama: "Super Admin 10" }
+            ]
+        };
+
+        function toggleFields() {
+            const role = document.getElementById('roleSelect').value;
+            const authFields = document.getElementById('authFields');
+            if (role === 'USER') {
+                authFields.classList.add('hidden');
+            } else {
+                authFields.classList.remove('hidden');
+            }
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const role = document.getElementById('roleSelect').value;
+            let finalUsername = "";
+
+            if (role === 'USER') {
+                finalUsername = "Tamu Pegawai";
+            } else {
+                const nipInput = document.getElementById('username').value;
+                const passInput = document.getElementById('password').value;
+
+                // Cek Validasi Akun
+                const akunDitemukan = dataAkun[role].find(u => u.nip === nipInput && u.pass === passInput);
+
+                if (akunDitemukan) {
+                    finalUsername = akunDitemukan.nama;
+                } else {
+                    alert("Maaf, NIP atau Password salah untuk role " + role);
+                    return;
+                }
+            }
+
+            // Simpan Data Login
+            localStorage.setItem('userRole', role);
+            localStorage.setItem('userName', finalUsername);
+
+            // Arahkan ke Dashboard
+            window.location.href = "admin.html";
+        });
+    </script>
+</body>
+</html>

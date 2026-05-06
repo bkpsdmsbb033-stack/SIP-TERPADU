@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Terpadu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .role-section { display: none; }
+        .modal { transition: opacity 0.25s ease; z-index: 100; }
+        body.modal-active { overflow: hidden; }
+        .nav-badge {
+            position: absolute; top: -5px; right: -5px;
+            display: flex; align-items: center; justify-content: center;
+            min-width: 18px; height: 18px; padding: 0 4px;
+            font-size: 10px; font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col">
+
+    <nav class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white p-1.5 rounded-lg">
+                        <i data-lucide="shield-check" class="text-indigo-900 w-6 h-6"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tighter uppercase">SIP-Terpadu</span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-1" id="main-nav">
+                    <a href="admin.html" class="px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition bg-indigo-800/50">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    
+                    <div id="nav-admin-section" class="role-section space-x-1">
+                        <a href="surat_masuk.html" class="px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition">
+                            <i data-lucide="mail" class="w-4 h-4"></i> Surat Masuk
+                        </a>
+                        <a href="penomoran_surat.html" class="px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition">
+                            <i data-lucide="hash" class="w-4 h-4"></i> Penomoran
+                        </a>
+                    </div>
+
+                    <div id="nav-administrator-section" class="role-section space-x-1">
+                        <a href="aset_umum.html" class="px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition">
+                            <i data-lucide="package" class="w-4 h-4"></i> Aset Umum
+                        </a>
+                        <a href="Pinjam_pakai.html" class="px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition">
+                            <i data-lucide="calendar-range" class="w-4 h-4"></i> Pinjam Pakai
+                        </a>
+                        <a href="disposisi.html" class="px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Disposisi
+                        </a>
+                        <a href="verifikasi.html" class="relative px-4 py-2 rounded-md hover:bg-indigo-800 flex items-center gap-2 transition">
+                            <i data-lucide="check-square" class="w-4 h-4"></i> Verifikasi
+                            <span id="verif-nav-count" class="hidden nav-badge bg-red-500 text-white rounded-full">0</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 border-l border-indigo-700 pl-4">
+                    <div class="hidden sm:block text-right">
+                        <p class="text-[10px] text-indigo-300 font-bold uppercase tracking-widest leading-none" id="role-label">Role</p>
+                        <p class="text-sm font-semibold" id="user-display-name">Username</p>
+                    </div>
+                    <button onclick="logout()" class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-indigo-400 hover:bg-red-500 transition shadow-inner">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <div class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Ringkasan Statistik</h1>
+                <p class="text-slate-500 text-sm italic" id="welcome-msg">Memuat data...</p>
+            </div>
+            <div class="flex bg-slate-200 p-1 rounded-xl shadow-inner">
+                <button onclick="switchTab('arsip')" id="tab-arsip" class="px-6 py-2 rounded-lg text-xs font-bold transition bg-white shadow text-indigo-600">ARSIP SURAT</button>
+                <button onclick="switchTab('booking')" id="tab-booking" class="px-6 py-2 rounded-lg text-xs font-bold transition text-slate-500 hover:text-indigo-600">BOOKING ASET</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start text-indigo-600">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Surat</p>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-total-surat">0</h3>
+                    </div>
+                    <div class="p-2 bg-indigo-50 rounded-lg"><i data-lucide="inbox" class="w-5 h-5"></i></div>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-emerald-600">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Penomoran</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-total-penomoran">0</h3>
+                </div>
+                <div class="p-2 bg-emerald-50 rounded-lg"><i data-lucide="hash" class="w-5 h-5"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-amber-600">
+                <div>
+                    <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Verif Pending</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-pending">0</h3>
+                </div>
+                <div class="p-2 bg-amber-50 rounded-lg"><i data-lucide="clock" class="w-5 h-5"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-blue-600">
+                <div>
+                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Booking Aktif</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-booking-aktif">0</h3>
+                </div>
+                <div class="p-2 bg-blue-50 rounded-lg"><i data-lucide="calendar" class="w-5 h-5"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-green-600">
+                <div>
+                    <p class="text-[10px] font-bold text-green-500 uppercase tracking-wider">Selesai</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-selesai">0</h3>
+                </div>
+                <div class="p-2 bg-green-50 rounded-lg"><i data-lucide="check-circle" class="w-5 h-5"></i></div>
+            </div>
+        </div>
+
+        <section id="section-arsip" class="block">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="archive" class="w-5 h-5 text-indigo-600"></i> Arsip Surat Masuk
+                    </h2>
+                    <button id="btn-input-user" onclick="toggleModal('modal-surat')" class="hidden px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-2 shadow-md">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> INPUT SURAT MASUK
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-widest border-b">
+                                <th class="px-6 py-4 font-bold">Agenda & Info</th>
+                                <th class="px-6 py-4 font-bold">No. Surat</th>
+                                <th class="px-6 py-4 font-bold">Asal & Perihal</th>
+                                <th class="px-6 py-4 font-bold text-center">Status</th>
+                                <th class="px-6 py-4 font-bold">Posisi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-arsip-body" class="text-sm text-slate-600 divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-booking" class="hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-5 h-5 text-indigo-600"></i> Peminjaman Barang & Gedung
+                    </h2>
+                    <button id="btn-booking-user" onclick="toggleModal('modal-booking')" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-2 shadow-md">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> BUAT BOOKING BARU
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-widest border-b">
+                                <th class="px-6 py-4 font-bold">Nama Peminjam</th>
+                                <th class="px-6 py-4 font-bold">Item / Gedung</th>
+                                <th class="px-6 py-4 font-bold">Jadwal Pakai</th>
+                                <th class="px-6 py-4 font-bold text-center">Status</th>
+                                <th class="px-6 py-4 font-bold text-center">Lokasi Aset</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-booking-body" class="text-sm text-slate-600 divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Form Surat -->
+    <div id="modal-surat" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+        <div class="modal-overlay absolute w-full h-full bg-slate-900 opacity-50"></div>
+        <div class="modal-container bg-white w-full max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-y-auto">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-lg">Input Surat Masuk</h3>
+                <button onclick="toggleModal('modal-surat')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="form-surat" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nomor Surat</label>
+                    <input type="text" id="noSurat" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Asal Surat</label>
+                    <input type="text" id="asalSurat" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Perihal</label>
+                    <textarea id="perihal" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none h-20"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tanggal Surat</label>
+                    <input type="date" id="tglSurat" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Upload Dokumen Surat</label>
+                    <input type="file" id="fileSurat" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition">
+                </div>
+                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition duration-200">KIRIM KE VERIFIKASI & SIMPAN</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Form Booking -->
+    <div id="modal-booking" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+        <div class="modal-overlay absolute w-full h-full bg-slate-900 opacity-50"></div>
+        <div class="modal-container bg-white w-full max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-y-auto">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800">Form Pengajuan Booking</h3>
+                <button onclick="toggleModal('modal-booking')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="form-booking" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nama Lengkap Peminjam</label>
+                    <input type="text" id="namaPeminjam" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nama Item / Gedung</label>
+                    <input type="text" id="namaAset" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Kategori</label>
+                    <select id="jenisAset" onchange="handleJenisAsetChange()" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="Barang">Barang / Peralatan</option>
+                        <option value="Gedung">Gedung / Ruangan</option>
+                    </select>
+                </div>
+                <div id="container-lokasi">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Lokasi Aset</label>
+                    <input type="text" id="lokasiAset" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: Lab Komputer A">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Mulai Pakai</label>
+                        <input type="date" id="tglMulai" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Selesai Pakai</label>
+                        <input type="date" id="tglSelesai" required class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Upload Bukti</label>
+                    <input type="file" id="fileBooking" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition">
+                </div>
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition duration-200">KIRIM KE VERIFIKASI & PINJAM PAKAI</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm text-slate-500 font-medium">&copy; 2026 <span class="text-indigo-900 font-bold">SIP-Terpadu</span>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = (localStorage.getItem('userRole') || 'USER').toUpperCase(); 
+            const username = localStorage.getItem('userName') || 'Pengguna';
+            
+            document.getElementById('role-label').innerText = role;
+            document.getElementById('user-display-name').innerText = username;
+
+            const navAdmin = document.getElementById('nav-admin-section');
+            const navAdministrator = document.getElementById('nav-administrator-section');
+            const btnInputSurat = document.getElementById('btn-input-user');
+            const btnBookingBaru = document.getElementById('btn-booking-user');
+
+            if (role === 'ADMINISTRATOR') {
+                navAdmin.style.display = 'flex';
+                navAdministrator.style.display = 'flex';
+                document.getElementById('welcome-msg').innerText = "Sistem Penuh - Selamat bekerja, Administrator " + username;
+            } 
+            else if (role === 'ADMIN') {
+                navAdmin.style.display = 'flex';
+                navAdministrator.style.display = 'none';
+                document.getElementById('welcome-msg').innerText = "Manajemen Data - Selamat bekerja, Admin " + username;
+            } 
+            else {
+                navAdmin.style.display = 'none';
+                navAdministrator.style.display = 'none';
+                btnInputSurat.classList.remove('hidden');
+                btnBookingBaru.classList.remove('hidden'); 
+                document.getElementById('welcome-msg').innerText = `Selamat datang kembali, ${username}.`;
+            }
+
+            updateStatistics();
+            renderArsipSurat();
+            renderBooking();
+            lucide.createIcons();
+            handleJenisAsetChange();
+        });
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle('opacity-0');
+            modal.classList.toggle('pointer-events-none');
+            document.body.classList.toggle('modal-active');
+        }
+
+        function handleJenisAsetChange() {
+            const jenis = document.getElementById('jenisAset').value;
+            const containerLokasi = document.getElementById('container-lokasi');
+            const inputLokasi = document.getElementById('lokasiAset');
+            
+            if (jenis === 'Barang') {
+                containerLokasi.style.display = 'block';
+                inputLokasi.setAttribute('required', 'true');
+            } else {
+                containerLokasi.style.display = 'none';
+                inputLokasi.removeAttribute('required');
+                inputLokasi.value = '';
+            }
+        }
+
+        // FUNGSI SIMPAN SURAT: Masuk ke Arsip Surat (nav: Surat Masuk) & Data Verifikasi (nav: Verifikasi)
+        document.getElementById('form-surat').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const arsip = JSON.parse(localStorage.getItem('arsipSuratMasuk')) || [];
+            const dataVerifikasi = JSON.parse(localStorage.getItem('dataVerifikasi')) || [];
+            const fileInput = document.getElementById('fileSurat');
+            
+            let lastAgenda = 0;
+            if (arsip.length > 0) {
+                lastAgenda = Math.max(...arsip.map(s => s.noAgenda || 0));
+            }
+
+            const newSurat = {
+                id: Date.now(),
+                noAgenda: lastAgenda + 1,
+                noSurat: document.getElementById('noSurat').value,
+                asalSurat: document.getElementById('asalSurat').value,
+                perihal: document.getElementById('perihal').value,
+                tglSurat: document.getElementById('tglSurat').value,
+                file: fileInput.files[0] ? fileInput.files[0].name : '-',
+                status: 'Pending',
+                posisi: 'Verifikasi Administrator'
+            };
+
+            // Simpan ke Arsip (Menu Surat Masuk)
+            arsip.push(newSurat);
+            localStorage.setItem('arsipSuratMasuk', JSON.stringify(arsip));
+
+            // Simpan ke Verifikasi (Menu Verifikasi)
+            dataVerifikasi.push({ 
+                ...newSurat, 
+                type: 'SURAT', 
+                user: localStorage.getItem('userName') || 'User',
+                tanggalInput: new Date().toLocaleString() 
+            });
+            localStorage.setItem('dataVerifikasi', JSON.stringify(dataVerifikasi));
+
+            Swal.fire('Berhasil!', 'Data telah disimpan di menu Surat Masuk dan Verifikasi.', 'success');
+            toggleModal('modal-surat');
+            this.reset();
+            renderArsipSurat();
+            updateStatistics();
+        });
+
+        // FUNGSI SIMPAN BOOKING: Masuk ke Data Booking (nav: Pinjam Pakai) & Data Verifikasi (nav: Verifikasi)
+        document.getElementById('form-booking').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const dataBooking = JSON.parse(localStorage.getItem('dataBooking')) || [];
+            const dataVerifikasi = JSON.parse(localStorage.getItem('dataVerifikasi')) || [];
+            const fileInput = document.getElementById('fileBooking');
+            
+            const newBooking = {
+                id: Date.now(),
+                user: document.getElementById('namaPeminjam').value,
+                namaAset: document.getElementById('namaAset').value,
+                jenis: document.getElementById('jenisAset').value,
+                lokasi: document.getElementById('lokasiAset').value || '-',
+                tglMulai: document.getElementById('tglMulai').value,
+                tglSelesai: document.getElementById('tglSelesai').value,
+                file: fileInput.files[0] ? fileInput.files[0].name : '-',
+                status: 'Pending'
+            };
+
+            // Simpan ke Data Booking (Menu Pinjam Pakai)
+            dataBooking.push(newBooking);
+            localStorage.setItem('dataBooking', JSON.stringify(dataBooking));
+
+            // Simpan ke Verifikasi (Menu Verifikasi)
+            dataVerifikasi.push({ 
+                ...newBooking, 
+                type: 'ASET', 
+                tanggalInput: new Date().toLocaleString() 
+            });
+            localStorage.setItem('dataVerifikasi', JSON.stringify(dataVerifikasi));
+            
+            Swal.fire('Berhasil!', 'Data telah disimpan di menu Pinjam Pakai dan Verifikasi.', 'success');
+            toggleModal('modal-booking');
+            this.reset();
+            renderBooking();
+            updateStatistics();
+        });
+
+        function renderArsipSurat() {
+            const data = JSON.parse(localStorage.getItem('arsipSuratMasuk')) || [];
+            const body = document.getElementById('table-arsip-body');
+            body.innerHTML = data.length ? '' : '<tr><td colspan="5" class="p-10 text-center text-slate-400 italic text-sm">Belum ada arsip surat masuk.</td></tr>';
+            
+            data.slice().sort((a, b) => b.noAgenda - a.noAgenda).forEach(s => {
+                const statusColor = s.status === 'Selesai' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+                body.insertAdjacentHTML('beforeend', `<tr class="hover:bg-slate-50 transition border-b border-slate-50">
+                    <td class="px-6 py-4 font-bold text-indigo-900">
+                        #${String(s.noAgenda).padStart(3, '0')}
+                        <div class="text-[9px] text-slate-400 font-normal">${s.tglSurat}</div>
+                    </td>
+                    <td class="px-6 py-4 text-xs font-mono">${s.noSurat}</td>
+                    <td class="px-6 py-4">
+                        <div class="font-semibold text-slate-700">${s.asalSurat}</div>
+                        <div class="text-[10px] text-slate-400">${s.perihal}</div>
+                        <div class="text-[9px] text-indigo-500 italic">File: ${s.file}</div>
+                    </td>
+                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-[10px] font-bold ${statusColor}">${s.status}</span></td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${s.posisi}</td>
+                </tr>`);
+            });
+            lucide.createIcons();
+        }
+
+        function renderBooking() {
+            const data = JSON.parse(localStorage.getItem('dataBooking')) || [];
+            const body = document.getElementById('table-booking-body');
+            body.innerHTML = data.length ? '' : '<tr><td colspan="5" class="p-10 text-center text-slate-400 italic text-sm">Belum ada riwayat booking aset.</td></tr>';
+            
+            data.slice().reverse().forEach(b => {
+                const statusColor = b.status === 'Disetujui' ? 'bg-green-100 text-green-700' : 'bg-indigo-100 text-indigo-700';
+                body.insertAdjacentHTML('beforeend', `<tr class="hover:bg-slate-50 transition border-b border-slate-50">
+                    <td class="px-6 py-4 font-bold text-indigo-900">${b.user}</td>
+                    <td class="px-6 py-4 text-xs text-slate-700">
+                        <b>${b.jenis}</b>: ${b.namaAset}
+                        <div class="text-[9px] text-indigo-500 italic">File: ${b.file}</div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500">
+                        <div class="text-emerald-600 font-bold">${b.tglMulai}</div>
+                        <div>s/d ${b.tglSelesai}</div>
+                    </td>
+                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-[10px] font-bold ${statusColor}">${b.status}</span></td>
+                    <td class="px-6 py-4 text-center text-xs text-slate-500">${b.lokasi}</td>
+                </tr>`);
+            });
+        }
+
+        function updateStatistics() {
+            const surat = JSON.parse(localStorage.getItem('arsipSuratMasuk')) || [];
+            const booking = JSON.parse(localStorage.getItem('dataBooking')) || [];
+            const verif = JSON.parse(localStorage.getItem('dataVerifikasi')) || [];
+            
+            document.getElementById('stat-total-surat').innerText = surat.length;
+            document.getElementById('stat-pending').innerText = verif.length;
+            document.getElementById('stat-booking-aktif').innerText = booking.length;
+            document.getElementById('stat-selesai').innerText = surat.filter(s => s.status === 'Selesai').length;
+            
+            const badge = document.getElementById('verif-nav-count');
+            if(verif.length > 0) {
+                badge.innerText = verif.length;
+                badge.classList.remove('hidden');
+            } else { badge.classList.add('hidden'); }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('section-arsip').classList.toggle('hidden', tab !== 'arsip');
+            document.getElementById('section-booking').classList.toggle('hidden', tab !== 'booking');
+            
+            const btnArsip = document.getElementById('tab-arsip');
+            const btnBooking = document.getElementById('tab-booking');
+            
+            if (tab === 'arsip') {
+                btnArsip.className = "px-6 py-2 rounded-lg text-xs font-bold transition bg-white shadow text-indigo-600";
+                btnBooking.className = "px-6 py-2 rounded-lg text-xs font-bold transition text-slate-500 hover:text-indigo-600";
+            } else {
+                btnBooking.className = "px-6 py-2 rounded-lg text-xs font-bold transition bg-white shadow text-emerald-600";
+                btnArsip.className = "px-6 py-2 rounded-lg text-xs font-bold transition text-slate-500 hover:text-indigo-600";
+            }
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Keluar?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4338ca',
+                confirmButtonText: 'Ya, Keluar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('userRole');
+                    window.location.href = "login.html";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

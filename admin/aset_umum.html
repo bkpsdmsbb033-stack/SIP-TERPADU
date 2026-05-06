@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Aset - Bagian Umum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .img-preview { object-fit: cover; width: 100%; height: 100%; border-radius: 8px; }
+        
+        @media print {
+            nav, #form-container, .btn-aksi, #filter-container { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .xl\:col-span-3 { width: 100% !important; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #000 !important; padding: 6px !important; font-size: 10pt !important; color: black !important; }
+            th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+            img { width: 50px !important; height: 50px !important; }
+            .no-print { display: none !important; }
+            .category-header { background-color: #e2e8f0 !important; font-weight: bold !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <nav class="bg-indigo-900 text-white shadow-md px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <a href="admin.html" class="hover:bg-indigo-800 p-2 rounded-lg transition">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <h1 class="font-bold tracking-tight uppercase">Manajemen Aset Umum & Keuangan</h1>
+        </div>
+        <div id="role-badge" class="px-3 py-1 bg-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-wider">Role</div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            
+            <div class="xl:col-span-1" id="form-container">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-8">
+                    <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i data-lucide="package-plus" class="text-indigo-600"></i> Input Aset Baru
+                    </h2>
+                    
+                    <form id="formAset" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Lokasi / Kategori</label>
+                            <select id="lokasiAset" onchange="toggleFields()" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 text-sm font-medium">
+                                <optgroup label="Lokasi Kantor & Pendopo">
+                                    <option value="Bagian Umum">Bagian Umum (Kantor)</option>
+                                    <option value="Pendopo Bupati">Pendopo Bupati</option>
+                                    <option value="Pendopo Wakil Bupati">Pendopo Wakil Bupati</option>
+                                    <option value="Pendopo Sekda">Pendopo Sekda</option>
+                                </optgroup>
+                                <optgroup label="Kendaraan Dinas">
+                                    <option value="Kendaraan Roda 2">Kendaraan Roda 2</option>
+                                    <option value="Kendaraan Roda 4">Kendaraan Roda 4</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Barang / Kendaraan</label>
+                            <input type="text" id="namaBarang" placeholder="Contoh: Honda CRF / Meja Rapat" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                        </div>
+
+                        <div id="fieldMerek">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Merek</label>
+                            <input type="text" id="merekBarang" placeholder="Contoh: Olympic / Epson" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                        </div>
+
+                        <div id="fieldKendaraan" class="hidden space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1 text-[10px]">No. Rangka</label>
+                                    <input type="text" id="noRangka" placeholder="MHI..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1 text-[10px]">No. Mesin</label>
+                                    <input type="text" id="noMesin" placeholder="JMB..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Jatuh Tempo Pajak</label>
+                                <input type="date" id="pajakAset" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1 text-[10px]">Kode / No. Pol</label>
+                                <input type="text" id="kodeBarang" placeholder="1.3.2 / DE.." required class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1 text-[10px]">Thn Perolehan</label>
+                                <input type="number" id="tahunAset" placeholder="2024" required class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Kondisi</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="flex flex-col items-center p-2 border border-slate-100 rounded-lg cursor-pointer hover:bg-green-50 text-[10px]">
+                                    <input type="radio" name="kondisi" value="Baik" checked class="mb-1"> Baik
+                                </label>
+                                <label class="flex flex-col items-center p-2 border border-slate-100 rounded-lg cursor-pointer hover:bg-amber-50 text-[10px]">
+                                    <input type="radio" name="kondisi" value="Rusak Ringan" class="mb-1"> R. Ringan
+                                </label>
+                                <label class="flex flex-col items-center p-2 border border-slate-100 rounded-lg cursor-pointer hover:bg-red-50 text-[10px]">
+                                    <input type="radio" name="kondisi" value="Rusak Berat" class="mb-1"> R. Berat
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Foto Aset</label>
+                            <input type="file" id="fotoAset" accept="image/*" class="w-full text-xs file:bg-indigo-50 file:text-indigo-700 file:border-0 file:rounded-lg file:px-3 file:py-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Harga (Rp)</label>
+                            <input type="number" id="hargaAset" placeholder="0" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-indigo-700">
+                        </div>
+
+                        <button type="submit" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                            <i data-lucide="save" class="w-5 h-5"></i> SIMPAN DATA
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="xl:col-span-3">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="font-bold text-slate-800 flex items-center gap-2 text-xl">
+                                <i data-lucide="list" class="text-indigo-600"></i> Daftar Inventaris Aset
+                            </h2>
+                            <p class="text-xs text-slate-500 mt-1">Laporan data aset yang dipisahkan berdasarkan kategori lokasi.</p>
+                        </div>
+                        <div class="flex gap-2 no-print" id="filter-container">
+                            <select id="filterLokasi" onchange="renderTable()" class="text-xs px-3 py-2 rounded-lg border bg-slate-50 font-semibold">
+                                <option value="Semua">Semua Lokasi</option>
+                                <option value="Bagian Umum">Bagian Umum</option>
+                                <option value="Pendopo Bupati">Pendopo Bupati</option>
+                                <option value="Pendopo Wakil Bupati">Pendopo Wakil Bupati</option>
+                                <option value="Pendopo Sekda">Pendopo Sekda</option>
+                                <option value="Kendaraan Roda 2">Kendaraan Roda 2</option>
+                                <option value="Kendaraan Roda 4">Kendaraan Roda 4</option>
+                            </select>
+                            <button onclick="window.print()" class="px-3 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-black flex items-center gap-2">
+                                <i data-lucide="printer" class="w-4 h-4"></i> CETAK
+                            </button>
+                            <button onclick="exportToExcel()" class="px-3 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> EXCEL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table id="tabelDataAset" class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 text-slate-600 uppercase text-[9px] font-bold tracking-widest">
+                                <tr>
+                                    <th class="px-4 py-3 border-b">Foto</th>
+                                    <th class="px-4 py-3 border-b">Nama Barang</th>
+                                    <th class="px-4 py-3 border-b">Merek/Model</th>
+                                    <th class="px-4 py-3 border-b">No. Rangka/Mesin</th>
+                                    <th class="px-4 py-3 border-b">Kode/Tahun</th>
+                                    <th class="px-4 py-3 border-b text-red-600">Pajak</th>
+                                    <th class="px-4 py-3 border-b">Harga</th>
+                                    <th class="px-4 py-3 border-b">Kondisi</th>
+                                    <th class="px-4 py-3 border-b text-center btn-aksi no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelAset" class="text-[11px] divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div id="empty-state" class="p-20 text-center hidden">
+                        <i data-lucide="box" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i>
+                        <p class="text-slate-400 text-sm">Belum ada data aset.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        const form = document.getElementById('formAset');
+        const role = localStorage.getItem('userRole') || 'ADMIN';
+        document.getElementById('role-badge').innerText = role;
+
+        const formatter = new Intl.NumberFormat('id-ID', {
+            style: 'currency', currency: 'IDR', minimumFractionDigits: 0
+        });
+
+        function toggleFields() {
+            const lokasi = document.getElementById('lokasiAset').value;
+            const fieldKendaraan = document.getElementById('fieldKendaraan');
+            const fieldMerek = document.getElementById('fieldMerek');
+
+            if (lokasi.includes('Kendaraan')) {
+                fieldKendaraan.classList.remove('hidden');
+                fieldMerek.classList.add('hidden');
+            } else {
+                fieldKendaraan.classList.add('hidden');
+                fieldMerek.classList.remove('hidden');
+            }
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('fotoAset');
+            let fotoBase64 = "https://via.placeholder.com/150?text=Tanpa+Foto";
+
+            if (fileInput.files && fileInput.files[0]) {
+                fotoBase64 = await toBase64(fileInput.files[0]);
+            }
+            
+            const dataBaru = {
+                id: Date.now(),
+                lokasi: document.getElementById('lokasiAset').value,
+                nama: document.getElementById('namaBarang').value,
+                merek: document.getElementById('merekBarang').value || '-',
+                noRangka: document.getElementById('noRangka').value || '-',
+                noMesin: document.getElementById('noMesin').value || '-',
+                tglPajak: document.getElementById('pajakAset').value || '-',
+                kode: document.getElementById('kodeBarang').value,
+                tahun: document.getElementById('tahunAset').value,
+                harga: document.getElementById('hargaAset').value,
+                kondisi: document.querySelector('input[name="kondisi"]:checked').value,
+                foto: fotoBase64
+            };
+
+            let aset = JSON.parse(localStorage.getItem('dataAsetUmum')) || [];
+            aset.unshift(dataBaru);
+            localStorage.setItem('dataAsetUmum', JSON.stringify(aset));
+
+            form.reset();
+            toggleFields();
+            renderTable();
+            alert("Data Aset Berhasil Disimpan!");
+        });
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        function renderTable() {
+            const data = JSON.parse(localStorage.getItem('dataAsetUmum')) || [];
+            const filter = document.getElementById('filterLokasi').value;
+            const tabel = document.getElementById('tabelAset');
+            const empty = document.getElementById('empty-state');
+            
+            tabel.innerHTML = '';
+            
+            let filteredData = filter === 'Semua' ? data : data.filter(item => item.lokasi === filter);
+
+            if(filteredData.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            } else {
+                empty.classList.add('hidden');
+            }
+
+            const grouped = filteredData.reduce((acc, item) => {
+                if (!acc[item.lokasi]) acc[item.lokasi] = [];
+                acc[item.lokasi].push(item);
+                return acc;
+            }, {});
+
+            for (const lokasi in grouped) {
+                tabel.innerHTML += `
+                    <tr class="bg-slate-100 category-header">
+                        <td colspan="9" class="px-4 py-2 font-bold text-indigo-900 border-y border-slate-200">
+                            LOKASI / KATEGORI: ${lokasi.toUpperCase()} (${grouped[lokasi].length} ITEM)
+                        </td>
+                    </tr>
+                `;
+
+                grouped[lokasi].forEach((item) => {
+                    const statusColor = item.kondisi === 'Baik' ? 'bg-green-100 text-green-700' : 
+                                       item.kondisi === 'Rusak Ringan' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
+
+                    // Logika tampilan kondisional: Munculkan data rangka/mesin & pajak hanya jika kategori Kendaraan
+                    const isKendaraan = item.lokasi.includes('Kendaraan');
+                    const infoRangkaMesin = isKendaraan ? `R: ${item.noRangka}<br>M: ${item.noMesin}` : '-';
+                    const infoPajak = isKendaraan ? item.tglPajak : '-';
+
+                    tabel.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition border-b">
+                            <td class="px-4 py-3">
+                                <div class="w-12 h-12 rounded border overflow-hidden">
+                                    <img src="${item.foto}" class="img-preview" alt="foto">
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-800">${item.nama}</div>
+                                <div class="text-[8px] text-slate-400">ID: ${item.id}</div>
+                            </td>
+                            <td class="px-4 py-3 text-slate-600">${item.merek}</td>
+                            <td class="px-4 py-3 font-mono text-[9px]">
+                                ${infoRangkaMesin}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="font-bold">${item.kode}</div>
+                                <div>Th. ${item.tahun}</div>
+                            </td>
+                            <td class="px-4 py-3 font-bold text-red-600">${infoPajak}</td>
+                            <td class="px-4 py-3 font-bold">${formatter.format(item.harga)}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${statusColor}">${item.kondisi}</span>
+                            </td>
+                            <td class="px-4 py-3 text-center btn-aksi no-print">
+                                <button onclick="hapusAset(${item.id})" class="text-slate-300 hover:text-red-600">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function hapusAset(id) {
+            if(confirm("Hapus data aset ini?")) {
+                let data = JSON.parse(localStorage.getItem('dataAsetUmum'));
+                data = data.filter(item => item.id !== id);
+                localStorage.setItem('dataAsetUmum', JSON.stringify(data));
+                renderTable();
+            }
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById("tabelDataAset");
+            const fileName = "Laporan_Aset_Per_Lokasi.xls";
+            
+            let cloneTable = table.cloneNode(true);
+            cloneTable.querySelectorAll('.no-print, .btn-aksi').forEach(el => el.remove());
+            
+            let html = cloneTable.outerHTML;
+            const url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            const link = document.createElement("a");
+            link.download = fileName;
+            link.href = url;
+            link.click();
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>

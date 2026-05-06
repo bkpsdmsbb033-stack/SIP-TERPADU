@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bagian Umum Setda | Pemerintah Kabupaten/Kota</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        scroll-behavior: smooth;
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <nav class="bg-blue-900 text-white sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Lambang_Pancasila.png/120px-Lambang_Pancasila.png" alt="Logo Setda" class="h-12 w-auto">
+                <div class="leading-tight">
+                    <span class="text-xs uppercase tracking-widest opacity-80">SEKRETARIAT DAERAH</span>
+                    <span class="font-bold text-xl tracking-wider block">BAGIAN UMUM, PERENCANAAN DAN KEUANGAN</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-blue-300 active"">Home</a>
+                <a href="#profil" class="hover:text-blue-300 transition">Profil</a>
+                <a href="#pegawai" class="hover:text-blue-300 transition">Pegawai</a>
+                <a href="#tentang" class="hover:text-blue-300 transition">Tentang</a>
+                <a href="admin.html" class="bg-yellow-500 hover:bg-yellow-600 px-5 py-2 rounded-lg font-semibold text-blue-900 active">Log In</a>
+            </div>
+        </div>
+    </nav>
+
+    <header id="home" class="relative h-[80vh] flex items-center justify-center bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80');">
+        <div class="text-center text-white px-4">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Melayani dengan Profesionalisme</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Mendukung kelancaran tugas operasional pimpinan dan tata usaha Sekretariat Daerah demi pelayanan publik yang prima.</p>
+            <a href="#profil" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full text-lg transition">Selengkapnya</a>
+        </div>
+    </header>
+
+    <section id="pegawai" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-blue-900 mb-4 tracking-tight">Struktur Kepegawaian</h2>
+            <p class="text-gray-500 max-w-2xl mx-auto">Daftar pejabat dan staf di lingkungan Bagian Umum Sekretariat Daerah yang siap melayani dengan integritas.</p>
+            <div class="w-24 h-1 bg-yellow-500 mx-auto mt-6 rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            
+            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden text-center transform hover:-translate-y-2">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" 
+                         alt="Foto Pegawai" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                <div class="p-6">
+                    <h4 class="font-bold text-lg text-blue-900 mb-1 leading-tight">H. Ahmad Fauzi, S.T.</h4>
+                    <p class="text-blue-600 font-semibold text-sm mb-4 uppercase tracking-wider">Kepala Bagian Umum</p>
+                    <div class="pt-4 border-t border-gray-100">
+                        <span class="text-[10px] text-gray-400 font-mono tracking-widest uppercase block mb-1">Nomor Induk Pegawai</span>
+                        <p class="text-xs text-gray-600 font-medium tracking-widest">19850412 201001 1 002</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden text-center transform hover:-translate-y-2">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400" 
+                         alt="Foto Pegawai" 
+                         class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                <div class="p-6">
+                    <h4 class="font-bold text-lg text-blue-900 mb-1 leading-tight">Siti Aminah, S.Sos.</h4>
+                    <p class="text-blue-600 font-semibold text-sm mb-4 uppercase tracking-wider">Kasubag Tata Usaha</p>
+                    <div class="pt-4 border-t border-gray-100">
+                        <span class="text-[10px] text-gray-400 font-mono tracking-widest uppercase block mb-1">Nomor Induk Pegawai</span>
+                        <p class="text-xs text-gray-600 font-medium tracking-widest">19880120 201212 2 005</p>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+    </div>
+</section>
